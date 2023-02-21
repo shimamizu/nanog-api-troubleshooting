@@ -12,15 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse
-import logging
-import os
-import sys
-from datetime import datetime
-from getpass import getpass
-from pathlib import Path
+try:
+    # importing libraries
+    import argparse
+    import logging
+    import os
+    import sys
+    from datetime import datetime
+    from getpass import getpass
+    from pathlib import Path
 
-import netlib
+    import netlib
+except ImportError as error:
+    print(error)
+    quit()
+except Exception as exception:
+    print(exception)
 
 parser = argparse.ArgumentParser()
 parser.add_argument(

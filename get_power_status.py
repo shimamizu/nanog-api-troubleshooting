@@ -12,17 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import argparse
-import datetime
-import logging
-import os
-import sys
-from getpass import getpass
-from subprocess import check_output
+try:
+    # importing libraries
+    import argparse
+    import datetime
+    import logging
+    import os
+    import sys
+    from getpass import getpass
+    from subprocess import check_output
 
-from prettytable import PrettyTable
+    from prettytable import PrettyTable
 
-import netlib
+    import netlib
+except ImportError as error:
+    print(error)
+    quit()
+except Exception as exception:
+    print(exception)
 
 parser = argparse.ArgumentParser()
 parser.add_argument(

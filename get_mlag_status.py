@@ -25,6 +25,7 @@ try:
     import netlib
 except ImportError as error:
     print(error)
+    quit()
 except Exception as exception:
     print(exception)
 

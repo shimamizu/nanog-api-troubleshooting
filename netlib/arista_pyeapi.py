@@ -10,16 +10,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-import json
-import logging
-import os
-import socket
-import sys
+try:
+    # importing libraries
+    import datetime
+    import json
+    import logging
+    import os
+    import socket
+    import sys
 
-import pyeapi
+    import pyeapi
 
-import netlib.util
+    import netlib.util
+except ImportError as error:
+    print(error)
+    quit()
+except Exception as exception:
+    print(exception)
 
 
 class AristaPyeapi:

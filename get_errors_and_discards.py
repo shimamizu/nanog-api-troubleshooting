@@ -13,6 +13,7 @@
 # limitations under the License.
 
 try:
+    # importing libraries
     import argparse
     import datetime
     import logging
@@ -25,7 +26,6 @@ try:
     from prettytable import PrettyTable
 
     import netlib
-
 except ImportError as error:
     print(error)
     quit()
