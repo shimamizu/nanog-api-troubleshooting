@@ -15,11 +15,9 @@
 try:
     # importing libraries
     import argparse
-    import logging
     import os
     import sys
     import time
-    from getpass import getpass
 
     import netlib
 except ImportError as error:
@@ -65,7 +63,8 @@ try:
     hostname_short = eapi.get_hostname_short()
     print(f"\nHostname: {hostname_short}")
     print(
-        f'Model: {show_version["model"]} Hardware Revision: {show_version["hardware_rev"]}'
+        f'Model: {show_version["model"]} '
+        f'Hardware Revision: {show_version["hardware_rev"]}'
     )
     print(f'Serial Number: {show_version["serial_number"]}')
     print(f'OS Version: {show_version["eos_version"]}\n')
@@ -74,7 +73,7 @@ try:
     )
     print(f"{hostname_short}# show interface counters errors | nz\n")
     print(port_errors_nz)
-    print(f"Sleeping for 20 seconds and trying again.")
+    print("Sleeping for 20 seconds and trying again.")
     time.sleep(20)
     port_errors_nz = eapi.try_eapi_command(
         "show interfaces counters errors | nz", "enable", "text"

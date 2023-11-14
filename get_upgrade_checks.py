@@ -15,12 +15,9 @@
 try:
     # importing libraries
     import argparse
-    import logging
     import os
     import sys
     from datetime import datetime
-    from getpass import getpass
-    from pathlib import Path
 
     import netlib
 except ImportError as error:
@@ -94,7 +91,10 @@ try:
     switch_model = show_version["model"]
     if ("DCS-750" in switch_model) or ("DCS-780" in switch_model):
         show_command_array.insert(8, "show module")
-    filename = f"{output_dir}/{switch_hostname_short}_{switch_eos_version}_{logs_time_stamp}_upgrade_checks.txt"
+    filename = (
+        f"{output_dir}/{switch_hostname_short}_{switch_eos_version}_"
+        f"{logs_time_stamp}_upgrade_checks.txt"
+    )
 
     for show_command in show_command_array:
         print(f"Grabbing outputs for [{show_command}]")

@@ -15,13 +15,7 @@
 try:
     # importing libraries
     import argparse
-    import logging
     import os
-    import sys
-    from getpass import getpass
-    from pathlib import Path
-
-    import pyeapi
 
     import netlib
 except ImportError as error:

@@ -15,10 +15,7 @@
 try:
     # importing libraries
     import argparse
-    import logging
     import os
-    import sys
-    from getpass import getpass
 
     import netlib
 except ImportError as error:
