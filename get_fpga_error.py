@@ -16,13 +16,11 @@ try:
     # importing libraries
     import argparse
     import datetime
-    import logging
     import os
-    import sys
     from datetime import timedelta
-    from getpass import getpass
 
-    from prettytable import PrettyTable
+    from rich.console import Console
+    from rich.table import Table
 
     import netlib
 except ImportError as error:
@@ -59,6 +57,8 @@ start_logger = netlib.setup_logging("get_fpga_errors", output_dir)
 logger = start_logger[0]
 logger_full_path = start_logger[1]
 
+console = Console()
+
 # instantiate the eAPI library
 eapi = netlib.AristaPyeapi(username, password, switch_hostname, logger)
 
@@ -78,23 +78,15 @@ print(f"Serial Number: {serial_number}")
 print(f"OS Version: {version}")
 print(f"Uptime: {uptime}")
 
-fpga_table = PrettyTable()
-fpga_table.field_names = [
-    "Query",
-    "Data",
-]
-
-fpga_table.header = False
-fpga_table.align["Query"] = "l"
-fpga_table.align["Data"] = "l"
+fpga_table = Table(show_header=False)
+fpga_table.add_column("Query", justify="left", style="cyan", no_wrap=True)
+fpga_table.add_column("Data", justify="right", style="magenta")
 
 for value in fpga_uncorrected:
     error_count = fpga_error_count = fpga_uncorrected[value]["count"]
     fpga_table.add_row(
-        [
-            f"{value} Error Count",
-            error_count,
-        ]
+        f"{value} Error Count",
+        str(error_count),
     )
     if error_count > 0:
         fpga_error_first = str(
@@ -108,19 +100,14 @@ for value in fpga_uncorrected:
             )
         )
         fpga_table.add_row(
-            [
-                f"{value} First Occurence (UTC)",
-                fpga_error_first,
-            ]
+            f"{value} First Occurence (UTC)",
+            str(fpga_error_first),
         )
         fpga_table.add_row(
-            [
-                f"{value} Last Occurence (UTC)",
-                fpga_error_last,
-            ]
+            f"{value} Last Occurence (UTC)",
+            str(fpga_error_last),
         )
 
-fpga_table.sortby = "Query"
-print(fpga_table)
+console.print(fpga_table)
 
 netlib.cleanup_log_if_empty(logger_full_path)
