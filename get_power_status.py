@@ -15,14 +15,10 @@
 try:
     # importing libraries
     import argparse
-    import datetime
-    import logging
     import os
-    import sys
-    from getpass import getpass
-    from subprocess import check_output
 
-    from prettytable import PrettyTable
+    from rich.console import Console
+    from rich.table import Table
 
     import netlib
 except ImportError as error:
@@ -74,15 +70,22 @@ else:
     location = eapi.try_eapi_command("show snmp v2-mib location", "enable")["location"]
 
 try:
-    pdu_table = PrettyTable()
-    pdu_table.field_names = ["PSU Number", "PSU Model", "Serial Number"]
+    pdu_table = Table()
+    pdu_table.add_column("PSU Number", justify="center", style="cyan", no_wrap=True)
+    pdu_table.add_column("PSU Model", justify="center")
+    pdu_table.add_column("Serial Number", justify="center", style="magenta")
+    console = Console()
+
     for pdu in get_power:
         pdu_model = get_power[pdu]["name"]
         pdu_serial_number = get_power[pdu]["serialNum"]
         if "PWR" in pdu_model:
-            pdu_table.add_row([pdu, pdu_model, pdu_serial_number])
-    # uncomment to print the whole table
-    # print(pdu_table)
+            pdu_table.add_row(
+                pdu,
+                pdu_model,
+                pdu_serial_number,
+            )
+    console.print(pdu_table)
 except NameError:
     print("No PDU data found, please investigate.")
 print(f"\nHostname: {switch_hostname}")
@@ -94,10 +97,21 @@ print(f"Location: {location}")
 print(f'OS Version: {show_version["eos_version"]}')
 for power_supply in power_status_json:
     if power_status_json[power_supply]["state"] != "ok":
-        print(
-            f'PSU{power_supply} is reporting a state of {power_status_json[power_supply]["state"]} - {get_power[power_supply]["name"]}, SN: {get_power[power_supply]["serialNum"]}'
+        console.print(
+            f"[red]PSU{power_supply} is reporting a state of "
+            f'{power_status_json[power_supply]["state"]} - '
+            f'{get_power[power_supply]["name"]}, SN: '
+            f'{get_power[power_supply]["serialNum"]}',
+            highlight=False,
         )
 print(f"\n{get_hostname}# show environment power\n")
-print(power_status)
+things_to_color = {
+    "Power Loss": "[red]Power Loss[/red]",
+    "Offline": "[red]Offline[/red]",
+    "Ok": "[green]Ok[/green]",
+}
+for old, new in things_to_color.items():
+    power_status = power_status.replace(old, new)
+console.print(power_status, highlight=False)
 
 netlib.cleanup_log_if_empty(logger_full_path)
