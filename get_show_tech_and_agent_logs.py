@@ -15,16 +15,12 @@
 try:
     # importing libraries
     import argparse
-    import logging
     import os
     import sys
     import tarfile
     from datetime import datetime
-    from getpass import getpass
-    from pathlib import Path
 
     import pexpect
-    import pyeapi
 
     import netlib
 except ImportError as error:
@@ -97,7 +93,8 @@ try:
     print("Zipping up /mnt/flash/schedule/tech-support/* into a tar.")
     historical_techs_filename = f"{base_filename}historical_techs.tar.gz"
     eapi.try_eapi_command(
-        f"bash timeout 10 tar -cvf - /mnt/flash/schedule/tech-support/* > /mnt/flash/{historical_techs_filename}",
+        f"bash timeout 10 tar -cvf - /mnt/flash/schedule/tech-support/* > "
+        f"/mnt/flash/{historical_techs_filename}",
         "enable",
         "text",
     )
@@ -122,7 +119,10 @@ array_of_files = []
 
 
 def json_to_file(filename, json_source):
-    new_filename = f"{output_dir}/{ticket_number}_{switch_hostname_short}_{logs_time_stamp}_{filename}"
+    new_filename = (
+        f"{output_dir}/{ticket_number}_{switch_hostname_short}"
+        f"_{logs_time_stamp}_{filename}"
+    )
     with open(new_filename, "w") as my_file:
         if filename == "disk_free.txt" or filename == "dir_all_filesystems.txt":
             for each_line in json_source:
@@ -173,11 +173,12 @@ except Exception as exception:
     print(exception)
 else:
     print(
-        f"Successfully tar'ed up all files into {output_dir}/{base_filename}tac_pack.tar.gz and now removing individual files."
+        f"Successfully tar'ed up all files into {output_dir}/{base_filename}"
+        f"tac_pack.tar.gz and now removing individual files."
     )
     for tac_file in array_of_files:
         os.remove(tac_file)
-    print(f"Done! Please don't forget to upload this TAC pack to Arista.")
+    print("Done! Please don't forget to upload this TAC pack to Arista.")
     time_finish = datetime.now()
     time_end = (time_finish - time_start).total_seconds()
     print(
