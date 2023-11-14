@@ -16,14 +16,13 @@ try:
     # importing libraries
     import argparse
     import datetime
-    import logging
     import os
+    import sys
     import time
-    from getpass import getpass
 
     import numpy as np
-    import pyeapi
-    from prettytable import PrettyTable
+    from rich.console import Console
+    from rich.table import Table
 
     import netlib
 except ImportError as error:
@@ -35,18 +34,15 @@ except Exception as exception:
 
 def read_the_errors():
     get_errors = eapi.get_interface_errors()
-    interface_counters_table = PrettyTable()
-    interface_counters_table.title = "show interfaces counters errors | nz"
-    interface_counters_table.field_names = [
-        "Port",
-        "FCS",
-        "Align",
-        "Symbol",
-        "Rx",
-        "Runts",
-        "Giants",
-        "Tx",
-    ]
+    interface_counters_table = Table(title="show interfaces counters errors | nz")
+    interface_counters_table.add_column("Port", justify="right", style="magenta")
+    interface_counters_table.add_column("FCS", justify="right")
+    interface_counters_table.add_column("Align", justify="right")
+    interface_counters_table.add_column("Symbol", justify="right")
+    interface_counters_table.add_column("Rx", justify="right")
+    interface_counters_table.add_column("Runts", justify="right")
+    interface_counters_table.add_column("Giants", justify="right")
+    interface_counters_table.add_column("Tx", justify="right")
     interface_errors_array = {}
     number_of_errors = 0
     for interface in get_errors:
@@ -69,16 +65,14 @@ def read_the_errors():
         ):
             number_of_errors += 1
             interface_counters_table.add_row(
-                [
-                    interface,
-                    port_fcs_errors,
-                    port_alignment_errors,
-                    port_symbol_errors,
-                    port_in_errors,
-                    port_frame_too_shorts,
-                    port_frame_too_longs,
-                    port_out_errors,
-                ]
+                interface,
+                str(port_fcs_errors),
+                str(port_alignment_errors),
+                str(port_symbol_errors),
+                str(port_in_errors),
+                str(port_frame_too_shorts),
+                str(port_frame_too_longs),
+                str(port_out_errors),
             )
             interface_errors_array[interface] = [
                 port_fcs_errors,
@@ -90,7 +84,7 @@ def read_the_errors():
                 port_out_errors,
             ]
     if number_of_errors > 0:
-        print(interface_counters_table)
+        console.print(interface_counters_table)
     else:
         print(f"No errors seen currently for {hostname_short}.")
     return interface_errors_array
@@ -99,9 +93,10 @@ def read_the_errors():
 def read_the_discards():
     get_discards = eapi.get_interface_discards()
     interface_discard_array = {}
-    interface_discard_table = PrettyTable()
-    interface_discard_table.title = "show interfaces counters discards | nz"
-    interface_discard_table.field_names = ["Port", "In Discards", "Out Discards"]
+    interface_discard_table = Table(title="show interfaces counters discards | nz")
+    interface_discard_table.add_column("Port", justify="right", style="magenta")
+    interface_discard_table.add_column("In Discards", justify="right")
+    interface_discard_table.add_column("Out Discards", justify="right")
     number_of_discards = 0
     for interface in get_discards:
         interface_discards = get_discards[interface]
@@ -110,11 +105,11 @@ def read_the_discards():
         if port_in_discards != 0 or port_out_discards != 0:
             number_of_discards += 1
             interface_discard_table.add_row(
-                [interface, port_in_discards, port_out_discards]
+                interface, str(port_in_discards), str(port_out_discards)
             )
             interface_discard_array[interface] = [port_in_discards, port_out_discards]
     if number_of_discards > 0:
-        print(interface_discard_table)
+        console.print(interface_discard_table)
     else:
         print(f"No discards seen currently for {hostname_short}.")
     return interface_discard_array
@@ -139,6 +134,8 @@ parser.add_argument(
     help="Folder for all outputs from the script",
 )
 
+console = Console()
+
 args = parser.parse_args()
 switch_list = open(args.switches)
 output_dir = args.output_directory
@@ -162,13 +159,16 @@ for switch_hostname in switch_list:
         "%Y-%m-%d %H:%M:%S"
     )
     print(
-        "\n#######################################################################################"
+        "\n##########################################"
+        "#############################################"
     )
     print(
-        f"Checking {hostname_short} for errors and discards the first time @ {current_time}"
+        f"Checking {hostname_short} for errors and discards "
+        f"the first time @ {current_time}"
     )
     print(
-        "#######################################################################################\n"
+        "\n##########################################"
+        "#############################################"
     )
 
     try:
@@ -179,20 +179,16 @@ for switch_hostname in switch_list:
             "%Y-%m-%d %H:%M:%S"
         )
         print(
-            "\n#######################################################################################"
+            "\n##########################################"
+            "#############################################"
         )
         print(
             f"Checking {hostname_short} for errors and discards again @ {current_time}"
         )
         print(
-            "#######################################################################################\n"
+            "\n##########################################"
+            "#############################################"
         )
-        # get_errors = eapi.try_eapi_command("show interfaces counters errors", "enable")[
-        #     "interfaceErrorCounters"
-        # ]
-        # get_discards = eapi.try_eapi_command(
-        #     "show interfaces counters discards", "enable"
-        # )["interfaces"]
 
         second_interface_errors_array = read_the_errors()
         second_interface_discard_array = read_the_discards()
@@ -213,14 +209,18 @@ for switch_hostname in switch_list:
             if np.any(int_values):
                 print("!!!!!!!!!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!")
                 print(
-                    f"Interface: {interface} saw new errors. FCS: {str(int_values[0])} Alignment: {str(int_values[1])} Symbol: {str(int_values[2])} Rx: {str(int_values[3])} Runts: {str(int_values[4])} Giants: {str(int_values[5])} Tx: {str(int_values[6])}"
+                    f"Interface: {interface} saw new errors. FCS: {str(int_values[0])} "
+                    f"Alignment: {str(int_values[1])} Symbol: {str(int_values[2])} Rx: "
+                    f"{str(int_values[3])} Runts: {str(int_values[4])} Giants: "
+                    f"{str(int_values[5])} Tx: {str(int_values[6])}"
                 )
         for interface in compare_interface_discards_change:
             int_values = compare_interface_discards_change[interface]
             if np.any(int_values):
                 print("!!!!!!!!!!!!!!!!!!!! ATTENTION !!!!!!!!!!!!!!!!!!!!")
                 print(
-                    f"Interface: {interface} saw new discards. Discards In: {str(int_values[0])} Discards Out: {str(int_values[1])}"
+                    f"Interface: {interface} saw new discards. Discards In: "
+                    f"{str(int_values[0])} Discards Out: {str(int_values[1])}"
                 )
 
     except KeyboardInterrupt:
