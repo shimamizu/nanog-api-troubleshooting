@@ -14,8 +14,10 @@ try:
     # importing libraries
     import datetime
     import getpass
+    import subprocess
     import logging
     import os
+    from subprocess import check_output
     import sys
 except ImportError as error:
     print(error)
@@ -67,3 +69,21 @@ def get_credentials(prefix="TACACS"):
     except KeyboardInterrupt:
         print("\n\nCaught Keyboard Interrupt - Exiting the program.")
         sys.exit()
+
+
+def check_ping(device_hostname):
+    try:
+        check_ping = check_output(f"ping -c 2 {device_hostname}", shell=True).decode(
+            "utf-8"
+        )
+        # search for percentage packet loss
+        for ping_stat in check_ping.split("\n"):
+            if "% packet loss" in ping_stat:
+                ping_ret = int(
+                    ping_stat.split(",")[-2].strip().split(" ")[0].rstrip("%")
+                )
+        return ping_ret
+    except subprocess.CalledProcessError:
+        ping_ret = int(100)
+        return ping_ret
+        print(f"{device_hostname} is not pinging, ping returned error code.")
