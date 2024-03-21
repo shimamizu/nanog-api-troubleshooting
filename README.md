@@ -2,6 +2,7 @@
 Scripts that go along with the talk "Simplified Troubleshooting Through API Scripting" that was presented at NANOG 87 by Cat Gurinsky on Monday, February 13th, 2023. This talk was updated and presented again at the Network Automation Forum inaugural conference AutoCon0 on November 14th, 2023.
 
 View the NANOG 87 talk here: https://www.youtube.com/watch?v=ne_4-5rdL_M
+
 View the updated AutoCon0 Network Automation Forum Talk here: https://www.youtube.com/watch?v=BYAwFvWvDiE
 
 View the NANOG 87 version of the slides here: https://storage.googleapis.com/site-media-prod/meetings/NANOG87/4617/20230213_Gurinsky_Simplified_Troubleshooting_Through_v1.pdf
